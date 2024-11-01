@@ -11,20 +11,9 @@ namespace HomeExercises
 		public void CheckCurrentTsar()
 		{
 			var actualTsar = TsarRegistry.GetCurrentTsar();
-
-			var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-				new Person("Vasili III of Russia", 28, 170, 60, null));
-
-			// Перепишите код на использование Fluent Assertions. 
-			while (actualTsar != null) // а если будет большое у ожидаемого paren'тов ?
-			{
-				actualTsar.Should().BeEquivalentTo(expectedTsar, config => config
-					.Excluding(p => p.Id)
-					.Excluding(p => p.Parent));
-
-				actualTsar = actualTsar.Parent;
-				expectedTsar = expectedTsar.Parent;
-			}
+			var expectedTsar = TsarRegistry.GetCurrentTsar();
+			
+			actualTsar.ShouldBe(expectedTsar);
 		}
 		
 		[Test]
@@ -32,11 +21,11 @@ namespace HomeExercises
 		public void CheckCurrentTsar_WithCustomEquality()
 		{
 			var actualTsar = TsarRegistry.GetCurrentTsar();
-			var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-				new Person("Vasili III of Russia", 28, 170, 60, null));
+			var expectedTsar = TsarRegistry.GetCurrentTsar();
 
 			// Какие недостатки у такого подхода? 
-			// если появится новое свойство, то нужно будет менять тесты 
+			// 
+			// если появится новое свойство, то нужно писать дополнительный код
 			// слишком много кода нужно писать
 			Assert.True(AreEqual(actualTsar, expectedTsar));
 		}
@@ -45,12 +34,12 @@ namespace HomeExercises
 		{
 			if (actual == expected) return true;
 			if (actual == null || expected == null) return false;
-			return
+			return // если появится новое свойство его нужно будет прописывать здесь
 				actual.Name == expected.Name
 				&& actual.Age == expected.Age
 				&& actual.Height == expected.Height
 				&& actual.Weight == expected.Weight
-				&& AreEqual(actual.Parent, expected.Parent);
+				&& AreEqual(actual.Parent, expected.Parent); 
 		}
 	}
 

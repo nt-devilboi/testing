@@ -10,45 +10,49 @@ namespace HomeExercises
 	{
 		[Test]
 		[TestCaseSource(nameof(GetCaseValidators))]
-		public void CheckValidator(NumberValidator validator, string number, bool expected)
+		public bool CheckValidator(NumberValidator validator, string number)
 		{
-			validator.IsValidNumber(number).Should().Be(expected, $"validator has {validator} for {number}");
+			return validator.IsValidNumber(number);
 		}
 
 		[Test]
-		[TestCase(-1,2, true)]
-		[TestCase(-1,2, false)]
+		[TestCase(0, 2, true, TestName = "precision <= 0")]
+		[TestCase(3, -1, false, TestName = "scale < 0")]
+		[TestCase(3, 5, false, TestName = "scale > precision")]
 		public void CheckArgumentException(int precision, int scale, bool onlyPositive)
 		{
-			Assert.Throws<ArgumentException>(() => new NumberValidator(precision, scale, onlyPositive));
+			Action action = () => new NumberValidator(precision, scale, onlyPositive);
+			action.Should().Throw<ArgumentException>();
 		}
 
 		[Test]
-		[TestCase(1,0, true)]
+		[TestCase(1, 0, true)]
 		public void CheckDoesNotThrow(int precision, int scale, bool onlyPositive)
 		{
-			Assert.DoesNotThrow(() => new NumberValidator(precision, scale, onlyPositive));
+			Action action = () => new NumberValidator(precision, scale, onlyPositive);
+			action.Should().NotThrow();
 		}
-		
+
 		private static IEnumerable<TestCaseData> GetCaseValidators()
 		{
-			yield return new TestCaseData(new NumberValidator(17, 2, true), "0", true);
-			yield return new TestCaseData(new NumberValidator(3, 2, true), "00.00", false);
-			yield return new TestCaseData(new NumberValidator(3, 2, true), "-0.00", false);
-			yield return new TestCaseData(new NumberValidator(3, 2, true), "+0.00", false);
-			yield return new TestCaseData(new NumberValidator(4, 2, true), "+1.23", true);
-			yield return new TestCaseData(new NumberValidator(3, 2, true), "+1.23", false);
-			yield return new TestCaseData(new NumberValidator(17, 2, true), "0.000", false);
-			yield return new TestCaseData(new NumberValidator(3, 2, true), "-1.23", false);
-			yield return new TestCaseData(new NumberValidator(3, 2, true), "a.sd", false);
+			yield return new TestCaseData(new NumberValidator(17, 2, true), "0").Returns(true);
+			yield return new TestCaseData(new NumberValidator(3, 2, true), "00.00").Returns(false);
+			yield return new TestCaseData(new NumberValidator(3, 2, true), "-0.00").Returns(false);
+			yield return new TestCaseData(new NumberValidator(3, 2, true), "+0.00").Returns(false);
+			yield return new TestCaseData(new NumberValidator(4, 2, true), "+1.23").Returns(true);
+			yield return new TestCaseData(new NumberValidator(3, 2, true), "+1.23").Returns(false);
+			yield return new TestCaseData(new NumberValidator(17, 2, true), "0.000").Returns(false);
+			yield return new TestCaseData(new NumberValidator(3, 2, true), "-1.23").Returns(false);
+			yield return new TestCaseData(new NumberValidator(3, 2, true), "a.sd").Returns(false);
 			// Новые тесты
-			yield return new TestCaseData(new NumberValidator(4, 2), "-1.23", true);
-			yield return new TestCaseData(new NumberValidator(1), "-", false);
-			yield return new TestCaseData(new NumberValidator(2, 0, true), "", false);
-			yield return new TestCaseData(new NumberValidator(4, 1), "+-13.0", false);
-			yield return new TestCaseData(new NumberValidator(9, 5, true), "+133.00001", true);
-			yield return new TestCaseData(new NumberValidator(9, 5, true), "+133,00001", true);
-			yield return new TestCaseData(new NumberValidator(3, 1, true), "+,1", false);
+			yield return new TestCaseData(new NumberValidator(4, 2), "-1.23").Returns(true);
+			yield return new TestCaseData(new NumberValidator(1), "-").Returns(false);
+			yield return new TestCaseData(new NumberValidator(2, 0, true), "").Returns(false);
+			yield return new TestCaseData(new NumberValidator(4, 1), "+-13.0").Returns(false);
+			yield return new TestCaseData(new NumberValidator(9, 5, true), "+133.00001").Returns(true);
+			yield return new TestCaseData(new NumberValidator(3, 1, true), "+1,0").Returns(true);
+			yield return new TestCaseData(new NumberValidator(3, 1, true), "+,1").Returns(false);
+			yield return new TestCaseData(new NumberValidator(3, 1, true), ",1").Returns(false);
 		}
 	}
 
