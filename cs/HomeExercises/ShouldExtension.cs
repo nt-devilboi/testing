@@ -1,5 +1,4 @@
 using FluentAssertions;
-using FluentAssertions.Primitives;
 
 namespace HomeExercises
 {
@@ -7,7 +6,7 @@ namespace HomeExercises
 	{
 		public static void ShouldBe(this Person personAssertions, Person person)
 		{
-			while (personAssertions != null) // а если будет большое у ожидаемого paren'тов ?
+			while (personAssertions != null)
 			{
 				personAssertions.Should().BeEquivalentTo(person, config => config
 					.Excluding(p => p.Id)

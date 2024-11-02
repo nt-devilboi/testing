@@ -53,6 +53,7 @@ namespace HomeExercises
 			yield return new TestCaseData(new NumberValidator(3, 1, true), "+1,0").Returns(true);
 			yield return new TestCaseData(new NumberValidator(3, 1, true), "+,1").Returns(false);
 			yield return new TestCaseData(new NumberValidator(3, 1, true), ",1").Returns(false);
+			yield return new TestCaseData(new NumberValidator(3, 1, true), ".").Returns(false);
 		}
 	}
 
